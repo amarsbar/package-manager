@@ -9,9 +9,11 @@ use crate::{Index, Result, UserError};
 
 pub fn configure(index: &Index, wtxn: &mut heed::RwTxn<'_>) -> Result<()> {
     let mut fields_ids_map = index.fields_ids_map(wtxn)?;
-    fields_ids_map.insert("_pk").ok_or(UserError::AttributeLimitReached)?;
+    fields_ids_map
+        .insert("id")
+        .ok_or(UserError::AttributeLimitReached)?;
     index.put_fields_ids_map(wtxn, &fields_ids_map)?;
-    index.put_primary_key(wtxn, "_pk")?;
+    index.put_primary_key(wtxn, "id")?;
 
     Ok(())
 }

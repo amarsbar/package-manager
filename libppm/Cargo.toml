@@ -1,0 +1,19 @@
+[package]
+name = "libppm"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+milli = { path = "crates/milli", features = [
+    "chinese",
+    "german",
+    "greek",
+    "hebrew",
+    "japanese-transliteration",
+    "khmer",
+    "swedish-recomposition",
+    "thai",
+    "turkish",
+    "vietnamese",
+] }

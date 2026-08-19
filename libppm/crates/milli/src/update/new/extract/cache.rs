@@ -1,0 +1,512 @@
+//! # How the Merge Algorithm works
+//!
+//! Each extractor create #Threads caches and balances the entries
+//! based on the hash of the keys. To do that we can use the
+//! hashbrown::hash_map::RawEntryBuilderMut::from_key_hashed_nocheck.
+//! This way we can compute the hash on our own, decide on the cache to
+//! target, and insert it into the right HashMap.
+//!
+//! #Thread  -> caches
+//! t1       -> [t1c1, t1c2, t1c3]
+//! t2       -> [t2c1, t2c2, t2c3]
+//! t3       -> [t3c1, t3c2, t3c3]
+//!
+//! When the extractors are done filling the caches, we want to merge
+//! the content of all the caches. We do a transpose and each thread is
+//! assigned the associated cache. By doing that we know that every key
+//! is put in a known cache and will collide with keys in the other
+//! caches of the other threads.
+//!
+//! #Thread  -> caches
+//! t1       -> [t1c1, t2c1, t3c1]
+//! t2       -> [t1c2, t2c2, t3c2]
+//! t3       -> [t1c3, t2c3, t3c3]
+//!
+//! When we encountered a miss in the other caches we must still try
+//! to find it in the spilled entries. This is the reason why we use
+//! a grenad sorter/reader so that we can seek "efficiently" for a key.
+//!
+//! ## More Detailled Algorithm
+//!
+//! Each sub-cache has an in-memory HashMap and some spilled
+//! lexicographically ordered entries on disk (grenad). We first iterate
+//! over the spilled entries of all the caches at once by using a merge
+//! join algorithm. This algorithm will merge the entries by using its
+//! merge function.
+//!
+//! Everytime a merged entry is emited by the merge join algorithm we also
+//! fetch the value from the other in-memory caches (HashMaps) to finish
+//! the merge. Everytime we retrieve an entry from the in-memory caches
+//! we mark them with a tombstone for later.
+//!
+//! Once we are done with the spilled entries we iterate over the in-memory
+//! HashMaps. We iterate over the first one, retrieve the content from the
+//! other onces and mark them with a tombstone again. We also make sure
+//! to ignore the dead (tombstoned) ones.
+//!
+//! ## Memory Control
+//!
+//! We can detect that there are no more memory available when the
+//! bump allocator reaches a threshold. When this is the case we
+//! freeze the cache. There is one bump allocator by thread and the
+//! memory must be well balanced as we manage one type of extraction
+//! at a time with well-balanced documents.
+//!
+//! It means that the unknown new keys added to the
+//! cache are directly spilled to disk: basically a key followed by a
+//! del/add bitmap. For the known keys we can keep modifying them in
+//! the materialized version in the cache: update the del/add bitmaps.
+//!
+//! For now we can use a grenad sorter for spilling even thought I think
+//! it's not the most efficient way (too many files open, sorting entries).
+
+use std::borrow::Cow;
+use std::cmp::Ordering;
+use std::collections::binary_heap::PeekMut;
+use std::collections::BinaryHeap;
+use std::fs::File;
+use std::hash::BuildHasher;
+use std::io::BufReader;
+use std::{iter, mem};
+
+use bumpalo::Bump;
+use bumparaw_collections::bbbul::{BitPacker, BitPacker4x};
+use bumparaw_collections::map::FrozenMap;
+use bumparaw_collections::{Bbbul, FrozenBbbul};
+use grenad::{MergeFunction, ReaderCursor};
+use hashbrown::hash_map::RawEntryMut;
+use hashbrown::HashMap;
+use roaring::RoaringBitmap;
+use rustc_hash::FxBuildHasher;
+
+use crate::update::new::thread_local::MostlySend;
+use crate::{CboRoaringBitmapCodec, Result};
+
+/// A cache that stores byte keys associated with document-id bitmaps.
+///
+/// Internally balances the content over `N` buckets for future merging.
+pub struct BalancedCaches<'extractor> {
+    hasher: FxBuildHasher,
+    alloc: &'extractor Bump,
+    max_memory: Option<usize>,
+    caches: InnerCaches<'extractor>,
+}
+
+enum InnerCaches<'extractor> {
+    Normal(NormalCaches<'extractor>),
+    Spilling(SpillingCaches<'extractor>),
+}
+
+impl<'extractor> BalancedCaches<'extractor> {
+    pub fn new_in(buckets: usize, max_memory: Option<usize>, alloc: &'extractor Bump) -> Self {
+        Self {
+            hasher: FxBuildHasher,
+            max_memory,
+            caches: InnerCaches::Normal(NormalCaches {
+                caches: iter::repeat_with(|| HashMap::with_hasher_in(FxBuildHasher, alloc))
+                    .take(buckets)
+                    .collect(),
+            }),
+            alloc,
+        }
+    }
+
+    fn buckets(&self) -> usize {
+        match &self.caches {
+            InnerCaches::Normal(caches) => caches.caches.len(),
+            InnerCaches::Spilling(caches) => caches.caches.len(),
+        }
+    }
+
+    pub fn insert_add_u32(&mut self, key: &[u8], n: u32) -> Result<()> {
+        if self.max_memory.is_some_and(|mm| self.alloc.allocated_bytes() >= mm) {
+            self.start_spilling()?;
+        }
+
+        let buckets = self.buckets();
+        match &mut self.caches {
+            InnerCaches::Normal(normal) => {
+                normal.insert_add_u32(&self.hasher, self.alloc, buckets, key, n);
+                Ok(())
+            }
+            InnerCaches::Spilling(spilling) => {
+                spilling.insert_add_u32(&self.hasher, buckets, key, n)
+            }
+        }
+    }
+
+    /// Make sure the cache is no longer allocating data
+    /// and writes every new and unknow entry to disk.
+    fn start_spilling(&mut self) -> Result<()> {
+        let BalancedCaches { hasher: _, alloc, max_memory: _, caches } = self;
+
+        if let InnerCaches::Normal(normal_caches) = caches {
+            tracing::trace!(
+                "We are spilling after we allocated {} bytes on thread #{}",
+                alloc.allocated_bytes(),
+                rayon::current_thread_index().unwrap_or(0)
+            );
+
+            let allocated: usize = normal_caches.caches.iter().map(|m| m.allocation_size()).sum();
+            tracing::trace!("The last allocated HashMap took {allocated} bytes");
+
+            let dummy = NormalCaches { caches: Vec::new() };
+            let NormalCaches { caches: cache_maps } = mem::replace(normal_caches, dummy);
+            *caches = InnerCaches::Spilling(SpillingCaches::from_cache_maps(cache_maps));
+        }
+
+        Ok(())
+    }
+
+    pub fn freeze(&mut self, source_id: usize) -> Result<Vec<FrozenCache<'_, 'extractor>>> {
+        match &mut self.caches {
+            InnerCaches::Normal(NormalCaches { caches }) => caches
+                .iter_mut()
+                .enumerate()
+                .map(|(bucket_id, map)| {
+                    // safety: we are transmuting the Bbbul into a FrozenBbbul
+                    //         that are the same size.
+                    let map = unsafe {
+                        std::mem::transmute::<
+                            &mut HashMap<
+                                &[u8],
+                                Bbbul<BitPacker4x>, // from this
+                                FxBuildHasher,
+                                &Bump,
+                            >,
+                            &mut HashMap<
+                                &[u8],
+                                FrozenBbbul<BitPacker4x>, // to that
+                                FxBuildHasher,
+                                &Bump,
+                            >,
+                        >(map)
+                    };
+                    Ok(FrozenCache {
+                        source_id,
+                        bucket_id,
+                        cache: FrozenMap::new(map),
+                        spilled: Vec::new(),
+                    })
+                })
+                .collect(),
+            InnerCaches::Spilling(SpillingCaches { caches, spilled_entries, .. }) => caches
+                .iter_mut()
+                .zip(mem::take(spilled_entries))
+                .enumerate()
+                .map(|(bucket_id, (map, sorter))| {
+                    let spilled = sorter
+                        .into_reader_cursors()?
+                        .into_iter()
+                        .map(ReaderCursor::into_inner)
+                        .map(BufReader::new)
+                        .map(|bufreader| grenad::Reader::new(bufreader).map_err(Into::into))
+                        .collect::<Result<_>>()?;
+                    // safety: we are transmuting the Bbbul into a FrozenBbbul
+                    //         that are the same size.
+                    let map = unsafe {
+                        std::mem::transmute::<
+                            &mut HashMap<
+                                &[u8],
+                                Bbbul<BitPacker4x>, // from this
+                                FxBuildHasher,
+                                &Bump,
+                            >,
+                            &mut HashMap<
+                                &[u8],
+                                FrozenBbbul<BitPacker4x>, // to that
+                                FxBuildHasher,
+                                &Bump,
+                            >,
+                        >(map)
+                    };
+                    Ok(FrozenCache { source_id, bucket_id, cache: FrozenMap::new(map), spilled })
+                })
+                .collect(),
+        }
+    }
+}
+
+/// SAFETY: No Thread-Local inside
+unsafe impl MostlySend for BalancedCaches<'_> {}
+
+struct NormalCaches<'extractor> {
+    caches: Vec<
+        HashMap<&'extractor [u8], Bbbul<'extractor, BitPacker4x>, FxBuildHasher, &'extractor Bump>,
+    >,
+}
+
+impl<'extractor> NormalCaches<'extractor> {
+    pub fn insert_add_u32(
+        &mut self,
+        hasher: &FxBuildHasher,
+        alloc: &'extractor Bump,
+        buckets: usize,
+        key: &[u8],
+        n: u32,
+    ) {
+        let hash = hasher.hash_one(key);
+        let bucket = compute_bucket_from_hash(buckets, hash);
+        match self.caches[bucket].raw_entry_mut().from_hash(hash, |&k| k == key) {
+            RawEntryMut::Occupied(mut entry) => {
+                entry.get_mut().insert(n);
+            }
+            RawEntryMut::Vacant(entry) => {
+                let mut bitmap = Bbbul::new_in(alloc);
+                bitmap.insert(n);
+                entry.insert_hashed_nocheck(hash, alloc.alloc_slice_copy(key), bitmap);
+            }
+        }
+    }
+}
+
+struct SpillingCaches<'extractor> {
+    caches: Vec<
+        HashMap<&'extractor [u8], Bbbul<'extractor, BitPacker4x>, FxBuildHasher, &'extractor Bump>,
+    >,
+    spilled_entries: Vec<grenad::Sorter<MergeCboRoaringBitmaps>>,
+    cbo_buffer: Vec<u8>,
+}
+
+impl<'extractor> SpillingCaches<'extractor> {
+    fn from_cache_maps(
+        caches: Vec<
+            HashMap<
+                &'extractor [u8],
+                Bbbul<'extractor, BitPacker4x>,
+                FxBuildHasher,
+                &'extractor Bump,
+            >,
+        >,
+    ) -> SpillingCaches<'extractor> {
+        SpillingCaches {
+            spilled_entries: iter::repeat_with(|| {
+                let mut builder = grenad::SorterBuilder::new(MergeCboRoaringBitmaps);
+                builder.dump_threshold(0);
+                builder.allow_realloc(false);
+                builder.build()
+            })
+            .take(caches.len())
+            .collect(),
+            caches,
+            cbo_buffer: Vec::new(),
+        }
+    }
+
+    pub fn insert_add_u32(
+        &mut self,
+        hasher: &FxBuildHasher,
+        buckets: usize,
+        key: &[u8],
+        n: u32,
+    ) -> Result<()> {
+        let hash = hasher.hash_one(key);
+        let bucket = compute_bucket_from_hash(buckets, hash);
+        match self.caches[bucket].raw_entry_mut().from_hash(hash, |&k| k == key) {
+            RawEntryMut::Occupied(mut entry) => {
+                entry.get_mut().insert(n);
+                Ok(())
+            }
+            RawEntryMut::Vacant(_entry) => spill_entry_to_sorter(
+                &mut self.spilled_entries[bucket],
+                &mut self.cbo_buffer,
+                key,
+                n,
+            ),
+        }
+    }
+}
+
+#[inline]
+fn compute_bucket_from_hash(buckets: usize, hash: u64) -> usize {
+    hash as usize % buckets
+}
+
+fn spill_entry_to_sorter(
+    spilled_entries: &mut grenad::Sorter<MergeCboRoaringBitmaps>,
+    cbo_buffer: &mut Vec<u8>,
+    key: &[u8],
+    docid: u32,
+) -> Result<()> {
+    cbo_buffer.clear();
+    CboRoaringBitmapCodec::serialize_into_vec(&RoaringBitmap::from([docid]), cbo_buffer);
+    spilled_entries.insert(key, cbo_buffer).map_err(Into::into)
+}
+
+pub struct FrozenCache<'a, 'extractor> {
+    bucket_id: usize,
+    source_id: usize,
+    cache: FrozenMap<
+        'a,
+        'extractor,
+        &'extractor [u8],
+        FrozenBbbul<'extractor, BitPacker4x>,
+        FxBuildHasher,
+    >,
+    spilled: Vec<grenad::Reader<BufReader<File>>>,
+}
+
+pub fn transpose_and_freeze_caches<'a, 'extractor>(
+    caches: &'a mut [BalancedCaches<'extractor>],
+) -> Result<Vec<Vec<FrozenCache<'a, 'extractor>>>> {
+    let width = caches.first().map(BalancedCaches::buckets).unwrap_or(0);
+    let mut bucket_caches: Vec<_> = iter::repeat_with(Vec::new).take(width).collect();
+
+    for (thread_index, thread_cache) in caches.iter_mut().enumerate() {
+        for frozen in thread_cache.freeze(thread_index)? {
+            bucket_caches[frozen.bucket_id].push(frozen);
+        }
+    }
+
+    Ok(bucket_caches)
+}
+
+/// Merges the caches that must be all associated to the same bucket
+/// but make sure to sort the different buckets before performing the merges.
+///
+/// # Panics
+///
+/// - If the bucket IDs in these frozen caches are not exactly the same.
+pub fn merge_caches_sorted<F>(frozen: Vec<FrozenCache>, mut f: F) -> Result<()>
+where
+    F: for<'a> FnMut(&'a [u8], RoaringBitmap) -> Result<()>,
+{
+    let mut maps = Vec::new();
+    let mut heap = BinaryHeap::new();
+    let mut current_bucket = None;
+    for FrozenCache { source_id, bucket_id, cache, spilled } in frozen {
+        assert_eq!(*current_bucket.get_or_insert(bucket_id), bucket_id);
+        maps.push((source_id, cache));
+        for reader in spilled {
+            let mut cursor = reader.into_cursor()?;
+            if cursor.move_on_next()?.is_some() {
+                heap.push(Entry { cursor, source_id });
+            }
+        }
+    }
+
+    loop {
+        let mut first_entry = match heap.pop() {
+            Some(entry) => entry,
+            None => break,
+        };
+
+        let (first_key, first_value) = match first_entry.cursor.current() {
+            Some((key, value)) => (key, value),
+            None => break,
+        };
+
+        let mut output = CboRoaringBitmapCodec::deserialize_from(first_value)?;
+        while let Some(mut entry) = heap.peek_mut() {
+            if let Some((key, value)) = entry.cursor.current() {
+                if first_key != key {
+                    break;
+                }
+
+                output |= CboRoaringBitmapCodec::deserialize_from(value)?;
+                // When we are done we the current value of this entry move make
+                // it move forward and let the heap reorganize itself (on drop)
+                if entry.cursor.move_on_next()?.is_none() {
+                    PeekMut::pop(entry);
+                }
+            }
+        }
+
+        // Once we merged all of the spilled bitmaps we must also
+        // fetch the entries from the non-spilled entries (the HashMaps).
+        for (source_id, map) in maps.iter_mut() {
+            debug_assert!(
+                !(map.get(first_key).is_some() && first_entry.source_id == *source_id),
+                "A thread should not have spiled a key that has been inserted in the cache"
+            );
+            if first_entry.source_id != *source_id {
+                if let Some(new) = map.get_mut(first_key) {
+                    union_and_clear_bbbul(&mut output, new);
+                }
+            }
+        }
+
+        // We send the merged entry outside.
+        (f)(first_key, output)?;
+
+        // Don't forget to put the first entry back into the heap.
+        if first_entry.cursor.move_on_next()?.is_some() {
+            heap.push(first_entry);
+        }
+    }
+
+    // Then manage the content on the HashMap entries that weren't taken (mem::take).
+    while let Some((_, mut map)) = maps.pop() {
+        // Make sure we don't try to work with entries already managed by the spilled
+        let mut ordered_entries: Vec<_> = map.iter_mut().collect();
+        ordered_entries.sort_unstable_by_key(|(key, _)| *key);
+
+        for (key, bbbul) in ordered_entries {
+            let mut output = RoaringBitmap::new();
+            union_and_clear_bbbul(&mut output, bbbul);
+
+            for (_, rhs) in maps.iter_mut() {
+                if let Some(new) = rhs.get_mut(key) {
+                    union_and_clear_bbbul(&mut output, new);
+                }
+            }
+
+            // Entries consumed while merging spilled or earlier in-memory values are empty now.
+            if !output.is_empty() {
+                (f)(key, output)?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+struct Entry<R> {
+    cursor: ReaderCursor<R>,
+    source_id: usize,
+}
+
+impl<R> Ord for Entry<R> {
+    fn cmp(&self, other: &Entry<R>) -> Ordering {
+        let skey = self.cursor.current().map(|(k, _)| k);
+        let okey = other.cursor.current().map(|(k, _)| k);
+        skey.cmp(&okey).then(self.source_id.cmp(&other.source_id)).reverse()
+    }
+}
+
+impl<R> Eq for Entry<R> {}
+
+impl<R> PartialEq for Entry<R> {
+    fn eq(&self, other: &Entry<R>) -> bool {
+        self.cmp(other) == Ordering::Equal
+    }
+}
+
+impl<R> PartialOrd for Entry<R> {
+    fn partial_cmp(&self, other: &Entry<R>) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+fn union_and_clear_bbbul<B: BitPacker>(output: &mut RoaringBitmap, bbbul: &mut FrozenBbbul<'_, B>) {
+    let mut iter = bbbul.iter_and_clear();
+    while let Some(block) = iter.next_block() {
+        output.extend(block);
+    }
+}
+
+struct MergeCboRoaringBitmaps;
+
+impl MergeFunction for MergeCboRoaringBitmaps {
+    type Error = crate::Error;
+
+    fn merge<'a>(&self, _key: &[u8], values: &[Cow<'a, [u8]>]) -> Result<Cow<'a, [u8]>> {
+        if values.len() == 1 {
+            Ok(values[0].clone())
+        } else {
+            let mut output = Vec::new();
+            CboRoaringBitmapCodec::merge_into(values.iter().map(AsRef::as_ref), &mut output)?;
+            Ok(Cow::Owned(output))
+        }
+    }
+}

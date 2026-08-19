@@ -1,0 +1,14 @@
+This search implementation includes modified source derived from the following
+projects:
+
+- milli and permissive-json-pointer from Meilisearch v1.53.1,
+  commit 577f7af28942b71782eab1e59f44ad8296ce0a92, licensed under MIT.
+- Charabia 0.9.9,
+  commit 5b8f34af3e33f4cca3c6c7ba14ad53ddeabcf7ce, licensed under MIT.
+- bbqueue 0.5.1,
+  commit e8af4a4bccc8eb36b2b0442c4a9c5cb839d1cea2,
+  licensed under MIT OR Apache-2.0.
+
+The corresponding license texts are retained in this directory. The full
+source-retrieval provenance used during extraction is archived with the
+development material in the project-root tmp directory.

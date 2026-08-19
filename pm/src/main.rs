@@ -95,8 +95,8 @@ impl Model {
                     .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT) =>
             {
                 self.query.push(character);
-                // currently doing synchronously so it blocks keyboard input
-                // generally sub-millisecond tho so prob not worth async unless it becomes a thing
+                // currently doing synchronously so it blocks keyboard input (buffered anyways)
+                // generally sub-millisecond tho so not worth async unless search time can get high
                 self.search();
             }
             _ => {}

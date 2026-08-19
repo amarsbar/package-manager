@@ -1,0 +1,9 @@
+[package]
+name = "pm"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+libppm = { path = "../libppm" }
+ratatui = "0.30.2"

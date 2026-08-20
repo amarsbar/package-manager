@@ -1,5 +1,8 @@
 use std::error::Error;
 use std::io;
+use std::sync::mpsc::{self, Receiver};
+use std::thread;
+use std::time::Duration;
 
 use libppm::{App as Package, InstallOutcome, PackageManager};
 use ratatui::crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
@@ -8,7 +11,8 @@ use ratatui::{prelude::*, widgets::*, DefaultTerminal};
 const RESULT_LIMIT: usize = 5;
 
 struct Model {
-    manager: PackageManager,
+    manager: Option<PackageManager>,
+    manager_rx: Receiver<Result<PackageManager, String>>,
     query: String,
     hits: Vec<Package>,
     selected: usize,
@@ -18,22 +22,31 @@ struct Model {
 }
 
 impl Model {
-    fn new(query: String) -> Result<Self, Box<dyn Error>> {
-        let mut model = Self {
-            manager: PackageManager::init()?,
+    fn new(query: String) -> Self {
+        let (manager_tx, manager_rx) = mpsc::channel();
+        thread::spawn(move || {
+            let manager = PackageManager::init().map_err(|error| format!("{error:#}"));
+            let _ = manager_tx.send(manager);
+        });
+
+        Self {
+            manager: None,
+            manager_rx,
             query,
             hits: Vec::new(),
             selected: 0,
             error: None,
             confirmation: None,
             chosen: None,
-        };
-        model.search();
-        Ok(model)
+        }
     }
 
     fn search(&mut self) {
-        match self.manager.search(&self.query, RESULT_LIMIT) {
+        let Some(manager) = self.manager.as_ref() else {
+            return;
+        };
+
+        match manager.search(&self.query, RESULT_LIMIT) {
             Ok(hits) => {
                 self.hits = hits;
                 self.selected = 0;
@@ -48,7 +61,16 @@ impl Model {
 
     fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         loop {
+            if let Ok(manager) = self.manager_rx.try_recv() {
+                self.manager = Some(manager.map_err(io::Error::other)?);
+                self.search();
+            }
+
             terminal.draw(|frame| self.render(frame))?;
+
+            if self.manager.is_none() && !event::poll(Duration::from_millis(16))? {
+                continue;
+            }
 
             if let Event::Key(key) = event::read()? {
                 if key.kind != KeyEventKind::Release && self.handle_key(key) {
@@ -141,6 +163,8 @@ impl Model {
 
         let status = if let Some(error) = &self.error {
             Line::styled(error.clone(), Color::Red)
+        } else if self.manager.is_none() {
+            Line::styled("Loading package catalog…", Color::DarkGray)
         } else if self.hits.is_empty() {
             Line::styled("No packages found", Color::DarkGray)
         } else {
@@ -167,13 +191,13 @@ impl Model {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let query = std::env::args().skip(1).collect::<Vec<_>>().join(" ");
-    let mut model = Model::new(query)?;
+    let mut model = Model::new(query);
     ratatui::run(|terminal| model.run(terminal))?;
 
-    if let Some(package) = model.chosen.as_ref() {
+    if let (Some(package), Some(manager)) = (model.chosen, model.manager) {
         println!("Installing {}…", package.name);
 
-        match model.manager.install(package.id)? {
+        match manager.install(package.id)? {
             InstallOutcome::Installed => println!("Installed {}.", package.name),
             InstallOutcome::AlreadyInstalled => {
                 println!("{} is already installed.", package.name);

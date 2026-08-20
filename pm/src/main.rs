@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::io;
 
-use libppm::{App as Package, PackageManager};
+use libppm::{App as Package, InstallOutcome, PackageManager};
 use ratatui::crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ratatui::{prelude::*, widgets::*, DefaultTerminal};
 
@@ -144,7 +144,7 @@ impl Model {
         } else if self.hits.is_empty() {
             Line::styled("No packages found", Color::DarkGray)
         } else {
-            Line::styled("↑/↓ select  •  Enter choose  •  Esc quit", Color::DarkGray)
+            Line::styled("↑/↓ select  •  Enter install  •  Esc quit", Color::DarkGray)
         };
         frame.render_widget(status, status_area);
 
@@ -153,7 +153,7 @@ impl Model {
                 .area()
                 .centered(Constraint::Percentage(70), Constraint::Length(5));
             let dialog = Paragraph::new(vec![
-                Line::from(format!("Choose {}?", package.name)),
+                Line::from(format!("Install {}?", package.name)),
                 Line::from(""),
                 Line::from("Enter/y confirm  •  Esc/n cancel"),
             ])
@@ -170,11 +170,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut model = Model::new(query)?;
     ratatui::run(|terminal| model.run(terminal))?;
 
-    if let Some(package) = model.chosen {
-        println!(
-            "{}:{}",
-            package.package_source.manager, package.package_source.package
-        );
+    if let Some(package) = model.chosen.as_ref() {
+        println!("Installing {}…", package.name);
+
+        match model.manager.install(package.id)? {
+            InstallOutcome::Installed => println!("Installed {}.", package.name),
+            InstallOutcome::AlreadyInstalled => {
+                println!("{} is already installed.", package.name);
+            }
+        }
     }
 
     Ok(())

@@ -1,10 +1,11 @@
 //! Package management library.
 
+mod flatpak;
 mod search;
 
 use std::fs;
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 
 const CATALOG_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../catalog.json");
@@ -24,7 +25,14 @@ pub struct PackageSource {
     pub package: String,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum InstallOutcome {
+    Installed,
+    AlreadyInstalled,
+}
+
 pub struct PackageManager {
+    apps: Vec<App>,
     search: search::Search,
 }
 
@@ -32,13 +40,25 @@ impl PackageManager {
     pub fn init() -> Result<Self> {
         let catalog = fs::read(CATALOG_PATH).with_context(|| format!("reading {CATALOG_PATH}"))?;
         let apps: Vec<App> = serde_json::from_slice(&catalog).context("parsing catalog.json")?;
+        let search = search::Search::build(&apps)?;
 
-        Ok(Self {
-            search: search::Search::build(&apps)?,
-        })
+        Ok(Self { apps, search })
     }
 
     pub fn search(&self, query: &str, limit: usize) -> Result<Vec<App>> {
         self.search.query(query, limit)
+    }
+
+    pub fn install(&self, app_id: u64) -> Result<InstallOutcome> {
+        let app = self
+            .apps
+            .iter()
+            .find(|app| app.id == app_id)
+            .with_context(|| format!("app {app_id} is not in the package catalog"))?;
+
+        match app.package_source.manager.as_str() {
+            "flatpak" => flatpak::install(&app.package_source.package),
+            manager => bail!("package manager {manager:?} is not supported"),
+        }
     }
 }

@@ -7,6 +7,7 @@ publish = false
 [dependencies]
 anyhow = "1"
 bumpalo = "3"
+libflatpak = "0.7"
 memmap2 = "0.9"
 milli = { path = "crates/milli", features = [
     "chinese",

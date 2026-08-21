@@ -2,6 +2,7 @@
 
 mod flatpak;
 mod nix;
+mod paru;
 mod search;
 
 use std::fs;
@@ -60,6 +61,8 @@ impl PackageManager {
         match app.package_source.manager.as_str() {
             "flatpak" => flatpak::install(&app.package_source.package),
             "nix" => nix::install(&app.package_source.package),
+            "pacman" => paru::install(&app.package_source.package),
+            "aur" => paru::install(&app.package_source.package),
             manager => bail!("package manager {manager:?} is not supported"),
         }
     }

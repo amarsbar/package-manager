@@ -4,6 +4,7 @@ mod flatpak;
 mod nix;
 mod paru;
 mod search;
+mod subvolume;
 
 use std::fs;
 

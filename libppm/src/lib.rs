@@ -1,5 +1,6 @@
 //! Package management library.
 
+mod bootloader;
 mod flatpak;
 mod nix;
 mod paru;
@@ -67,4 +68,10 @@ impl PackageManager {
             manager => bail!("package manager {manager:?} is not supported"),
         }
     }
+}
+
+pub fn update(user: &str) -> Result<()> {
+    let root = subvolume::UpdateRoot::prepare()?;
+    paru::update(root.path(), user)?;
+    bootloader::set_next_boot(root.path())
 }

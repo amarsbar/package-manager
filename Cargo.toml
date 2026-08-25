@@ -1,0 +1,13 @@
+[workspace]
+members = [
+    "libppm",
+    "libppm/crates/*",
+    "pm",
+]
+resolver = "2"
+
+[profile.release]
+codegen-units = 1
+
+[profile.release.package.heed]
+debug-assertions = true

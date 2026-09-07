@@ -38,7 +38,7 @@ pub(crate) fn install(package: &str) -> Result<InstallOutcome> {
 
 pub(crate) fn update(root: &Path, user: &str) -> Result<()> {
     let status = Command::new("arch-chroot")
-        .args(["-u", user])
+        .args(["-S", "-u", user])
         .arg(root)
         .args([
             "/usr/bin/env",
@@ -48,6 +48,7 @@ pub(crate) fn update(root: &Path, user: &str) -> Result<()> {
             "/usr/bin/pkexec",
             "--sudoflags",
             "/usr/bin/env SNAP_PAC_SKIP=y",
+            "--nosudoloop",
             "-Syu",
             "--skipreview",
             "--noupgrademenu",

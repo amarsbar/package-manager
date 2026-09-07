@@ -14,6 +14,12 @@ use serde::{Deserialize, Serialize};
 
 const CATALOG_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../catalog.json");
 
+#[derive(Clone, Copy)]
+pub(crate) enum Slot {
+    A,
+    B,
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct App {
     pub id: u64,
@@ -73,5 +79,5 @@ impl PackageManager {
 pub fn update(user: &str) -> Result<()> {
     let root = subvolume::UpdateRoot::prepare()?;
     paru::update(root.path(), user)?;
-    bootloader::set_next_boot(root.path())
+    bootloader::set_next_boot(root.path(), root.slot())
 }

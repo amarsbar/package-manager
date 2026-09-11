@@ -1,11 +1,11 @@
 //! Package management library.
 
-mod bootloader;
+pub mod update;
+
 mod flatpak;
 mod nix;
 mod paru;
 mod search;
-mod subvolume;
 
 use std::fs;
 
@@ -13,12 +13,6 @@ use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 
 const CATALOG_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../catalog.json");
-
-#[derive(Clone, Copy)]
-pub(crate) enum Slot {
-    A,
-    B,
-}
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct App {
@@ -74,10 +68,4 @@ impl PackageManager {
             manager => bail!("package manager {manager:?} is not supported"),
         }
     }
-}
-
-pub fn update(user: &str) -> Result<()> {
-    let root = subvolume::UpdateRoot::prepare()?;
-    paru::update(root.path(), user)?;
-    bootloader::set_next_boot(root.path(), root.slot())
 }

@@ -1,7 +1,4 @@
-use std::{
-    path::Path,
-    process::{Command, Stdio},
-};
+use std::process::{Command, Stdio};
 
 use anyhow::{bail, Context, Result};
 
@@ -34,41 +31,4 @@ pub(crate) fn install(package: &str) -> Result<InstallOutcome> {
     }
 
     bail!("installing {package} with Paru failed ({status})");
-}
-
-pub(crate) fn update(root: &Path, user: &str) -> Result<()> {
-    let status = Command::new("arch-chroot")
-        .args(["-S", "-u", user])
-        .arg(root)
-        .args([
-            "/usr/bin/env",
-            "HOME=/tmp",
-            "/usr/bin/paru",
-            "--sudo",
-            "/usr/bin/pkexec",
-            "--sudoflags",
-            "/usr/bin/env SNAP_PAC_SKIP=y",
-            "--nosudoloop",
-            "-Syu",
-            "--skipreview",
-            "--noupgrademenu",
-            "--nonewsonupgrade",
-            "--noconfirm",
-            "--useask",
-            "--ask",
-            "4",
-            "--pgpfetch",
-            "--failfast",
-        ])
-        .stdin(Stdio::null())
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .status()
-        .with_context(|| format!("starting Paru in {}", root.display()))?;
-
-    if status.success() {
-        return Ok(());
-    }
-
-    bail!("updating {} with Paru failed ({status})", root.display());
 }

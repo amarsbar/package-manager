@@ -7,12 +7,10 @@ mod paru;
 mod search;
 mod subvolume;
 
-use std::fs;
-
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 
-const CATALOG_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../catalog.json");
+const CATALOG: &[u8] = include_bytes!("../../catalog.json");
 
 #[derive(Clone, Copy)]
 pub(crate) enum Slot {
@@ -48,8 +46,7 @@ pub struct PackageManager {
 
 impl PackageManager {
     pub fn init() -> Result<Self> {
-        let catalog = fs::read(CATALOG_PATH).with_context(|| format!("reading {CATALOG_PATH}"))?;
-        let apps: Vec<App> = serde_json::from_slice(&catalog).context("parsing catalog.json")?;
+        let apps: Vec<App> = serde_json::from_slice(CATALOG).context("parsing catalog.json")?;
         let search = search::Search::build(&apps)?;
 
         Ok(Self { apps, search })

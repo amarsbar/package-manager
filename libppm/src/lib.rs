@@ -1,22 +1,13 @@
 //! Package management library.
 
-mod bootloader;
 mod flatpak;
-mod nix;
 mod paru;
 mod search;
-mod subvolume;
 
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 
 const CATALOG: &[u8] = include_bytes!("../../catalog.json");
-
-#[derive(Clone, Copy)]
-pub(crate) enum Slot {
-    A,
-    B,
-}
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct App {
@@ -65,16 +56,9 @@ impl PackageManager {
 
         match app.package_source.manager.as_str() {
             "flatpak" => flatpak::install(&app.package_source.package),
-            "nix" => nix::install(&app.package_source.package),
             "pacman" => paru::install(&app.package_source.package),
             "aur" => paru::install(&app.package_source.package),
             manager => bail!("package manager {manager:?} is not supported"),
         }
     }
-}
-
-pub fn update(user: &str) -> Result<()> {
-    let root = subvolume::UpdateRoot::prepare()?;
-    paru::update(root.path(), user)?;
-    bootloader::set_next_boot(root.path(), root.slot())
 }

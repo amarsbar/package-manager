@@ -39627,7 +39627,7 @@
       "manager": "pacman",
       "package": "claude-code"
     },
-    "traffic": 
+    "traffic": 100000
   },
   {
     "id": 3964,

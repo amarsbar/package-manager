@@ -9041,7 +9041,7 @@
   },
   {
     "id": 905,
-    "name": "FTB Electron App",
+    "name": "FTB App",
     "description": "Explore and manage FTB modpacks!",
     "package_source": {
       "manager": "flatpak",
@@ -23911,8 +23911,8 @@
   },
   {
     "id": 2392,
-    "name": "GNU Image Manipulation Program (GIMP)",
-    "description": "High-end image creation and manipulation",
+    "name": "GIMP",
+    "description": "GNU Image Manipulation Program",
     "package_source": {
       "manager": "flatpak",
       "package": "org.gimp.GIMP"
@@ -31747,7 +31747,7 @@
       "manager": "aur",
       "package": "chatgpt-desktop"
     },
-    "traffic": 0
+    "traffic": 10000
   },
   {
     "id": 3176,
@@ -32611,7 +32611,7 @@
   },
   {
     "id": 3262,
-    "name": "Chromium Web Browser",
+    "name": "Chromium",
     "description": "The web browser from Chromium project",
     "package_source": {
       "manager": "pacman",
@@ -34121,13 +34121,13 @@
   },
   {
     "id": 3413,
-    "name": "Hugging Face Hub Python library",
+    "name": "huggingface_hub",
     "description": "Download and share models and datasets from the Hugging Face Hub",
     "package_source": {
       "manager": "pacman",
       "package": "python-huggingface-hub"
     },
-    "traffic": 0
+    "traffic": 500
   },
   {
     "id": 3414,
@@ -39627,7 +39627,7 @@
       "manager": "pacman",
       "package": "claude-code"
     },
-    "traffic": 0
+    "traffic": 
   },
   {
     "id": 3964,

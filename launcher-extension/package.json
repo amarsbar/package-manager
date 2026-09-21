@@ -1,0 +1,36 @@
+{
+  "name": "pm-extension",
+  "version": "0.1.0",
+  "private": true,
+  "title": "pm",
+  "hideExtensionName": true,
+  "description": "Search and install apps with libppm.",
+  "author": "bflycomputer",
+  "license": "BSD-3-Clause",
+  "icon": "install.svg",
+  "platforms": ["Linux"],
+  "categories": ["Applications"],
+  "commands": [
+    {
+      "name": "install",
+      "title": "Install apps",
+      "description": "Search for an app and install it.",
+      "mode": "view",
+      "keywords": ["packages", "software", "download"]
+    }
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && node build.mjs"
+  },
+  "dependencies": {
+    "@vicinae/api": "0.29.0",
+    "react": "19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.3.0",
+    "@types/react": "19.1.17",
+    "esbuild": "^0.25.2",
+    "typescript": "5.9.2"
+  }
+}

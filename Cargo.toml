@@ -3,6 +3,7 @@ members = [
     "libppm",
     "libppm/crates/*",
     "pm",
+    "launcher-extension/bridge",
 ]
 resolver = "2"
 

@@ -1809,6 +1809,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "pm-extension-bridge"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "libppm",
+ "serde_json",
+ "tempfile",
+]
+
+[[package]]
 name = "portable-atomic"
 version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

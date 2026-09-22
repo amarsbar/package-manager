@@ -1,4 +1,4 @@
-import { Action, ActionPanel, environment, List } from "@vicinae/api";
+import { Action, ActionPanel, List } from "@vicinae/api";
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 type App = { id: number; name: string };
 type Status = "Installing" | "Installed ✓" | "Failed";
-const bridgePath = join(environment.assetsPath, "pm-extension-bridge");
+const bridgePath = join(__dirname, "bin", "pm-extension-bridge");
 
 export default function InstallApps() {
   const [query, setQuery] = useState("");

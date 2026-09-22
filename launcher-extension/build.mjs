@@ -20,9 +20,9 @@ await build({
   external: ["@vicinae/api", "react", "react/jsx-runtime"],
   outdir: "dist",
 });
-mkdirSync("dist/assets", { recursive: true });
+mkdirSync("dist/bin", { recursive: true });
 cpSync("assets", "dist/assets", { recursive: true });
-cpSync(artifact.executable, "dist/assets/pm-extension-bridge");
+cpSync(artifact.executable, "dist/bin/pm-extension-bridge");
 cpSync("package.json", "dist/package.json");
 cpSync("../LICENSE", "dist/LICENSE");
 cpSync("../libppm/LICENSES", "dist/LICENSES", { recursive: true });

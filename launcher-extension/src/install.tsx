@@ -1,4 +1,4 @@
-import { Action, ActionPanel, List } from "@vicinae/api";
+import { Action, ActionPanel, closeMainWindow, List, PopToRootType } from "@vicinae/api";
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
@@ -66,20 +66,28 @@ export default function InstallApps() {
     child.stdin.write(`${JSON.stringify(query)}\n`);
   }, [query]);
 
-  function install(app: App) {
+  async function install(app: App) {
     if (installing.current || statuses[app.id] === "Installed ✓") return;
     installing.current = true;
     setStatuses((current) => ({ ...current, [app.id]: "Installing" }));
+    const finish = (status: Status) => {
+      installing.current = false;
+      setStatuses((current) => ({ ...current, [app.id]: status }));
+    };
+    try {
+      // Release launcher focus before a package manager opens authentication.
+      await closeMainWindow({ popToRootType: PopToRootType.Suspended });
+    } catch (error) {
+      console.error(error);
+      finish("Failed");
+      return;
+    }
     // Install output is separate from the search protocol, and leaving the view
     // must not terminate the package manager midway through a transaction.
     const child = spawn(bridgePath, ["install", String(app.id)], {
       detached: true,
       stdio: "ignore",
     });
-    const finish = (status: Status) => {
-      installing.current = false;
-      setStatuses((current) => ({ ...current, [app.id]: status }));
-    };
     child.once("error", () => finish("Failed"));
     child.once("exit", (code) => finish(code === 0 ? "Installed ✓" : "Failed"));
     child.unref();

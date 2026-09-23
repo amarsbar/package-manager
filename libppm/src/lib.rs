@@ -2,12 +2,13 @@
 
 mod bootloader;
 mod flatpak;
+mod install_status;
 mod nix;
 mod paru;
 mod search;
 mod subvolume;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 
 const CATALOG: &[u8] = include_bytes!("../../catalog.json");
@@ -63,13 +64,15 @@ impl PackageManager {
             .find(|app| app.id == app_id)
             .with_context(|| format!("app {app_id} is not in the package catalog"))?;
 
-        match app.package_source.manager.as_str() {
-            "flatpak" => flatpak::install(&app.package_source.package),
+        let status = install_status::InstallStatus::start(app);
+        let result = match app.package_source.manager.as_str() {
+            "flatpak" => flatpak::install(&app.package_source.package, status.progress()),
             "nix" => nix::install(&app.package_source.package),
-            "pacman" => paru::install(&app.package_source.package),
-            "aur" => paru::install(&app.package_source.package),
-            manager => bail!("package manager {manager:?} is not supported"),
-        }
+            "pacman" | "aur" => paru::install(&app.package_source.package, status.progress()),
+            manager => Err(anyhow!("package manager {manager:?} is not supported")),
+        };
+        status.finish(&result);
+        result
     }
 }
 

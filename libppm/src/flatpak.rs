@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use anyhow::{Context, Result};
 use libflatpak::prelude::*;
 
@@ -6,7 +8,7 @@ use crate::InstallOutcome;
 const REMOTE: &str = "flathub";
 const BRANCH: &str = "stable";
 
-pub(crate) fn install(package: &str) -> Result<InstallOutcome> {
+pub(crate) fn install(package: &str, report: impl Fn(f64) + 'static) -> Result<InstallOutcome> {
     let installation = libflatpak::Installation::new_system(None::<&libflatpak::gio::Cancellable>)
         .context("opening the system Flatpak installation")?;
     let architecture = libflatpak::default_arch().context("determining Flatpak architecture")?;
@@ -27,6 +29,21 @@ pub(crate) fn install(package: &str) -> Result<InstallOutcome> {
                 .with_context(|| format!("adding {reference} from {REMOTE} to the transaction"));
         }
     }
+
+    let report = Rc::new(report);
+    transaction.connect_new_operation(move |transaction, operation, progress| {
+        // Flatpak reports each app/runtime separately, in execution order.
+        let operations = transaction.operations();
+        let completed = operations.iter().position(|op| op == operation).unwrap();
+        let total = operations.len();
+        let report = report.clone();
+        progress.set_update_frequency(100);
+        let update = move |progress: &libflatpak::TransactionProgress| {
+            report((completed as f64 + progress.progress() as f64 / 100.0) / total as f64);
+        };
+        update(progress);
+        progress.connect_changed(update);
+    });
 
     match transaction.run(None::<&libflatpak::gio::Cancellable>) {
         Ok(()) => Ok(InstallOutcome::Installed),

@@ -156,14 +156,8 @@ impl DownloadProgress {
             if self.total && !is_total {
                 return None;
             }
-            let percent: f64 = line
-                .rsplit_once(']')?
-                .1
-                .trim()
-                .strip_suffix('%')?
-                .trim()
-                .parse()
-                .ok()?;
+            let before = line.rsplit_once('%')?.0;
+            let percent: f64 = before.split_whitespace().last()?.parse().ok()?;
             return (0.0..=100.0).contains(&percent).then_some(percent / 100.0);
         }
         // makepkg's default curl downloader prints a twelve-column progress table.

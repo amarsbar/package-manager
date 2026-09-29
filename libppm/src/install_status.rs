@@ -46,7 +46,7 @@ impl InstallStatus {
 
     fn send(&self, status: &str, message: &str) {
         let _ = Command::new("qs")
-            .args(["-c", "pond-default", "ipc", "call", "installs", "update"])
+            .args(["-c", "pond-shell", "ipc", "call", "installs", "update"])
             .args([
                 &std::process::id().to_string(),
                 &self.name,

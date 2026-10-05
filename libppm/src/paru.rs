@@ -1,4 +1,5 @@
 use std::{
+    fs::File,
     io::{self, Read, Write},
     path::Path,
     process::{Command, ExitStatus, Stdio},
@@ -9,6 +10,7 @@ use anyhow::{bail, Context, Result};
 use crate::InstallOutcome;
 
 pub(crate) fn install(package: &str, report: impl Fn(f64)) -> Result<InstallOutcome> {
+    let _lock = lock(Path::new("/var/lib/pacman"))?;
     let mut command = Command::new("paru");
     command
         .args([
@@ -37,6 +39,12 @@ pub(crate) fn install(package: &str, report: impl Fn(f64)) -> Result<InstallOutc
     }
 
     bail!("installing {package} with Paru failed ({status})");
+}
+
+pub(crate) fn lock(database: &Path) -> Result<File> {
+    let lock = File::open(database).context("opening the Pacman database directory")?;
+    lock.lock().context("waiting for another Pacman request")?;
+    Ok(lock)
 }
 
 pub(crate) fn update(root: &Path, user: &str) -> Result<()> {

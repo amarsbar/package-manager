@@ -77,6 +77,7 @@ impl PackageManager {
 }
 
 pub fn update(user: &str) -> Result<()> {
+    let _lock = paru::lock(std::path::Path::new("/var/lib/pacman"))?;
     let root = subvolume::UpdateRoot::prepare()?;
     paru::update(root.path(), user)?;
     bootloader::set_next_boot(root.path(), root.slot())

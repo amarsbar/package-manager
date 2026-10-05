@@ -16,7 +16,7 @@ export default function InstallApps() {
   const [statuses, setStatuses] = useState<Record<number, Status>>({});
   const search = useRef<ChildProcessWithoutNullStreams | null>(null);
   const latestQuery = useRef(query);
-  const installing = useRef(false);
+  const installing = useRef(new Set<number>());
   latestQuery.current = query;
 
   useEffect(() => {
@@ -67,11 +67,11 @@ export default function InstallApps() {
   }, [query]);
 
   async function install(app: App) {
-    if (installing.current || statuses[app.id] === "Installed ✓") return;
-    installing.current = true;
+    if (installing.current.has(app.id) || statuses[app.id] === "Installed ✓") return;
+    installing.current.add(app.id);
     setStatuses((current) => ({ ...current, [app.id]: "Installing" }));
     const finish = (status: Status) => {
-      installing.current = false;
+      installing.current.delete(app.id);
       setStatuses((current) => ({ ...current, [app.id]: status }));
     };
     try {
@@ -104,7 +104,7 @@ export default function InstallApps() {
           accessories={[{ text: statuses[app.id] ?? "Install" }]}
           actions={
             <ActionPanel>
-              {!installing.current && statuses[app.id] !== "Installed ✓" && (
+              {!installing.current.has(app.id) && statuses[app.id] !== "Installed ✓" && (
                 <Action title="Install" onAction={() => install(app)} />
               )}
             </ActionPanel>

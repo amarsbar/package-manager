@@ -190,7 +190,13 @@ impl Model {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let query = std::env::args().skip(1).collect::<Vec<_>>().join(" ");
+    let args = std::env::args().skip(1).collect::<Vec<_>>();
+    if args == ["-u"] {
+        libppm::update()?;
+        return Ok(());
+    }
+
+    let query = args.join(" ");
     let mut model = Model::new(query);
     ratatui::run(|terminal| model.run(terminal))?;
 

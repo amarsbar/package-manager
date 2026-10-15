@@ -1,12 +1,25 @@
-use std::rc::Rc;
+use std::{
+    process::{Command, Stdio},
+    rc::Rc,
+};
 
-use anyhow::{Context, Result};
+use anyhow::{ensure, Context, Result};
 use libflatpak::prelude::*;
 
 use crate::InstallOutcome;
 
 const REMOTE: &str = "flathub";
 const BRANCH: &str = "stable";
+
+pub(crate) fn update() -> Result<()> {
+    let status = Command::new("flatpak")
+        .args(["update", "--assumeyes"])
+        .stdin(Stdio::null())
+        .status()
+        .context("starting Flatpak")?;
+    ensure!(status.success(), "updating Flatpaks failed ({status})");
+    Ok(())
+}
 
 pub(crate) fn install(package: &str, report: impl Fn(f64) + 'static) -> Result<InstallOutcome> {
     let installation = libflatpak::Installation::new_system(None::<&libflatpak::gio::Cancellable>)

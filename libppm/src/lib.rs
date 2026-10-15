@@ -5,9 +5,12 @@ mod install_status;
 mod nix;
 mod paru;
 mod search;
+mod update;
 
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
+
+pub use update::update;
 
 const CATALOG: &[u8] = include_bytes!("../../catalog.json");
 

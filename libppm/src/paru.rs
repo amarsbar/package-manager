@@ -47,6 +47,35 @@ pub(crate) fn lock(database: &Path) -> Result<File> {
     Ok(lock)
 }
 
+pub(crate) fn update() -> Result<()> {
+    let _lock = lock(Path::new("/var/lib/pacman"))?;
+    let status = Command::new("paru")
+        .args([
+            "--sudo",
+            "pkexec",
+            "--nosudoloop",
+            "-Syu",
+            "--skipreview",
+            "--noupgrademenu",
+            "--nonewsonupgrade",
+            "--noconfirm",
+            "--useask",
+            "--ask",
+            "4",
+            "--pgpfetch",
+            "--failfast",
+        ])
+        .stdin(Stdio::null())
+        .status()
+        .context("starting Paru")?;
+
+    if status.success() {
+        return Ok(());
+    }
+
+    bail!("updating packages with Paru failed ({status})");
+}
+
 fn run_with_progress(command: Command, report: impl Fn(f64)) -> Result<ExitStatus> {
     // script provides terminal output for Pacman's percentages. Quote each
     // argument for a fixed shell and keep the actual installer's input closed.

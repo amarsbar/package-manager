@@ -1,23 +1,15 @@
 //! Package management library.
 
-mod bootloader;
 mod flatpak;
 mod install_status;
 mod nix;
 mod paru;
 mod search;
-mod subvolume;
 
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 
 const CATALOG: &[u8] = include_bytes!("../../catalog.json");
-
-#[derive(Clone, Copy)]
-pub(crate) enum Slot {
-    A,
-    B,
-}
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct App {
@@ -74,11 +66,4 @@ impl PackageManager {
         status.finish(&result);
         result
     }
-}
-
-pub fn update(user: &str) -> Result<()> {
-    let _lock = paru::lock(std::path::Path::new("/var/lib/pacman"))?;
-    let root = subvolume::UpdateRoot::prepare()?;
-    paru::update(root.path(), user)?;
-    bootloader::set_next_boot(root.path(), root.slot())
 }

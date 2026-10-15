@@ -47,43 +47,6 @@ pub(crate) fn lock(database: &Path) -> Result<File> {
     Ok(lock)
 }
 
-pub(crate) fn update(root: &Path, user: &str) -> Result<()> {
-    let status = Command::new("arch-chroot")
-        .args(["-S", "-u", user])
-        .arg(root)
-        .args([
-            "/usr/bin/env",
-            "HOME=/tmp",
-            "/usr/bin/paru",
-            "--sudo",
-            "/usr/bin/pkexec",
-            "--sudoflags",
-            "/usr/bin/env SNAP_PAC_SKIP=y",
-            "--nosudoloop",
-            "-Syu",
-            "--skipreview",
-            "--noupgrademenu",
-            "--nonewsonupgrade",
-            "--noconfirm",
-            "--useask",
-            "--ask",
-            "4",
-            "--pgpfetch",
-            "--failfast",
-        ])
-        .stdin(Stdio::null())
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .status()
-        .with_context(|| format!("starting Paru in {}", root.display()))?;
-
-    if status.success() {
-        return Ok(());
-    }
-
-    bail!("updating {} with Paru failed ({status})", root.display());
-}
-
 fn run_with_progress(command: Command, report: impl Fn(f64)) -> Result<ExitStatus> {
     // script provides terminal output for Pacman's percentages. Quote each
     // argument for a fixed shell and keep the actual installer's input closed.

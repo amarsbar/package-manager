@@ -195,6 +195,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         libppm::update()?;
         return Ok(());
     }
+    if args == ["-a"] {
+        println!("{}", libppm::updates_available()?);
+        return Ok(());
+    }
 
     let query = args.join(" ");
     let mut model = Model::new(query);

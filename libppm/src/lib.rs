@@ -10,7 +10,7 @@ mod update;
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 
-pub use update::update;
+pub use update::{update, updates_available};
 
 const CATALOG: &[u8] = include_bytes!("../../catalog.json");
 

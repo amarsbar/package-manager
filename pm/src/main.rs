@@ -192,7 +192,9 @@ impl Model {
 fn main() -> Result<(), Box<dyn Error>> {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
     if args == ["-u"] {
-        libppm::update()?;
+        if libppm::update()? {
+            std::process::exit(2);
+        }
         return Ok(());
     }
     if args == ["-a"] {

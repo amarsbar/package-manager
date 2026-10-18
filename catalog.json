@@ -234,8 +234,8 @@
     "name": "Fluxer",
     "description": "Instant messaging and VoIP",
     "package_source": {
-      "manager": "flatpak",
-      "package": "app.fluxer.Fluxer"
+      "manager": "pacman",
+      "package": "fluxer"
     },
     "traffic": 1906
   },
@@ -534,8 +534,8 @@
     "name": "Zen",
     "description": "Stay focused, browse faster",
     "package_source": {
-      "manager": "flatpak",
-      "package": "app.zen_browser.zen"
+      "manager": "pacman",
+      "package": "zen-browser-bin"
     },
     "traffic": 68739
   },
@@ -15854,8 +15854,8 @@
     "name": "SysD Manager",
     "description": "A user-friendly application to manage systemd's units",
     "package_source": {
-      "manager": "flatpak",
-      "package": "io.github.plrigaux.sysd-manager"
+      "manager": "pacman",
+      "package": "sysd-manager"
     },
     "traffic": 1573
   },
@@ -23214,8 +23214,8 @@
     "name": "Equibop",
     "description": "A snappy Discord desktop client",
     "package_source": {
-      "manager": "flatpak",
-      "package": "org.equicord.equibop"
+      "manager": "pacman",
+      "package": "equibop"
     },
     "traffic": 4554
   },
@@ -27134,8 +27134,8 @@
     "name": "LocalSend",
     "description": "Share files to nearby devices",
     "package_source": {
-      "manager": "flatpak",
-      "package": "org.localsend.localsend_app"
+      "manager": "pacman",
+      "package": "localsend"
     },
     "traffic": 64493
   },
@@ -29774,8 +29774,8 @@
     "name": "Zotero",
     "description": "Collect, organize and cite research",
     "package_source": {
-      "manager": "flatpak",
-      "package": "org.zotero.Zotero"
+      "manager": "pacman",
+      "package": "zotero"
     },
     "traffic": 6016
   },

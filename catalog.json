@@ -33610,16 +33610,6 @@
     "traffic": 21000
   },
   {
-    "id": 3362,
-    "name": "GitHub Copilot",
-    "description": "Find, run and steer AI coding work across your repositories",
-    "package_source": {
-      "manager": "pacman",
-      "package": "github-copilot-app-bin"
-    },
-    "traffic": 0
-  },
-  {
     "id": 3363,
     "name": "GitHub Copilot CLI",
     "description": "Use GitHub Copilot's coding agent from your terminal",

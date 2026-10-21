@@ -31842,7 +31842,7 @@
   {
     "id": 3185,
     "name": "NVIDIA 580 32-bit drivers",
-    "description": "32-bit driver libraries for NVIDIA graphics cards",
+    "description": "NVIDIA drivers utilities (32-bit) (580xx)",
     "package_source": {
       "manager": "pacman",
       "package": "lib32-nvidia-580xx-utils"
@@ -31852,7 +31852,7 @@
   {
     "id": 3186,
     "name": "NVIDIA 580 drivers",
-    "description": "Driver utilities for NVIDIA graphics cards",
+    "description": "NVIDIA drivers utilities (580xx)",
     "package_source": {
       "manager": "pacman",
       "package": "nvidia-580xx-utils"
@@ -33132,7 +33132,7 @@
   {
     "id": 3314,
     "name": "Electron",
-    "description": "Build cross-platform desktop apps with JavaScript, HTML and CSS",
+    "description": "Meta package providing the latest available stable Electron build",
     "package_source": {
       "manager": "pacman",
       "package": "electron"
@@ -33492,7 +33492,7 @@
   {
     "id": 3350,
     "name": "GCC 15",
-    "description": "C and C++ compilers from the GNU Compiler Collection",
+    "description": "The GNU Compiler Collection - C and C++ frontends (15.x.x)",
     "package_source": {
       "manager": "pacman",
       "package": "gcc15"
@@ -33642,7 +33642,7 @@
   {
     "id": 3366,
     "name": "GNOME Bluetooth",
-    "description": "Connect and manage Bluetooth devices",
+    "description": "GNOME Bluetooth Subsystem",
     "package_source": {
       "manager": "pacman",
       "package": "gnome-bluetooth-3.0"
@@ -34312,7 +34312,7 @@
   {
     "id": 3433,
     "name": "OpenJDK 26",
-    "description": "Development kit for building and running Java programs",
+    "description": "OpenJDK Java 27 development kit",
     "package_source": {
       "manager": "pacman",
       "package": "jdk-openjdk"
@@ -34322,7 +34322,7 @@
   {
     "id": 3434,
     "name": "OpenJDK 11",
-    "description": "Development kit for building and running Java programs",
+    "description": "OpenJDK Java 11 development kit",
     "package_source": {
       "manager": "pacman",
       "package": "jdk11-openjdk"
@@ -34332,7 +34332,7 @@
   {
     "id": 3435,
     "name": "OpenJDK 17",
-    "description": "Development kit for building and running Java programs",
+    "description": "OpenJDK Java 17 development kit",
     "package_source": {
       "manager": "pacman",
       "package": "jdk17-openjdk"
@@ -34342,7 +34342,7 @@
   {
     "id": 3436,
     "name": "OpenJDK 21",
-    "description": "Development kit for building and running Java programs",
+    "description": "OpenJDK Java 21 development kit",
     "package_source": {
       "manager": "pacman",
       "package": "jdk21-openjdk"
@@ -34882,7 +34882,7 @@
   {
     "id": 3490,
     "name": "Kvantum",
-    "description": "SVG-based theme engine for Qt applications",
+    "description": "SVG-based theme engine for Qt6 (including config tool and extra themes)",
     "package_source": {
       "manager": "pacman",
       "package": "kvantum"
@@ -35002,7 +35002,7 @@
   {
     "id": 3502,
     "name": "LibreOffice Fresh",
-    "description": "Office suite with the newest features and enhancements",
+    "description": "LibreOffice branch which contains new features and program enhancements",
     "package_source": {
       "manager": "pacman",
       "package": "libreoffice-fresh"
@@ -35012,7 +35012,7 @@
   {
     "id": 3503,
     "name": "LibreOffice Still",
-    "description": "Office suite for documents, spreadsheets and presentations",
+    "description": "LibreOffice maintenance branch",
     "package_source": {
       "manager": "pacman",
       "package": "libreoffice-still"
@@ -35082,7 +35082,7 @@
   {
     "id": 3510,
     "name": "LLVM 21",
-    "description": "Modular compiler and toolchain infrastructure",
+    "description": "Compiler infrastructure (LLVM 21)",
     "package_source": {
       "manager": "pacman",
       "package": "llvm21"
@@ -35742,7 +35742,7 @@
   {
     "id": 3576,
     "name": "NVIDIA Settings for 580 drivers",
-    "description": "Configure your NVIDIA graphics driver",
+    "description": "Tool for configuring the NVIDIA graphics driver (580xx)",
     "package_source": {
       "manager": "pacman",
       "package": "nvidia-580xx-settings"
@@ -37462,7 +37462,7 @@
   {
     "id": 3748,
     "name": "sysstat",
-    "description": "Collect and report system performance statistics",
+    "description": "a collection of performance monitoring tools (iostat,isag,mpstat,pidstat,sadf,sar)",
     "package_source": {
       "manager": "pacman",
       "package": "sysstat"
@@ -37552,7 +37552,7 @@
   {
     "id": 3757,
     "name": "TeX Live",
-    "description": "Typeset documents with TeX and LaTeX",
+    "description": "TeX Live binaries",
     "package_source": {
       "manager": "pacman",
       "package": "texlive-bin"
@@ -39212,7 +39212,7 @@
   {
     "id": 3923,
     "name": "Nextcloud Server",
-    "description": "Store your files centrally on hardware you control",
+    "description": "A cloud server to store your files centrally on a hardware controlled by you",
     "package_source": {
       "manager": "pacman",
       "package": "nextcloud"

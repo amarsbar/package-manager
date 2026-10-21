@@ -40048,5 +40048,815 @@
       "package": "super-productivity"
     },
     "traffic": 5314
+  },
+  {
+    "id": 4007,
+    "name": "Btrfs Assistant",
+    "description": "An application for managing BTRFS subvolumes and Snapper snapshots",
+    "package_source": {
+      "manager": "pacman",
+      "package": "btrfs-assistant"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4008,
+    "name": "Catfish",
+    "description": "Versatile file searching tool",
+    "package_source": {
+      "manager": "pacman",
+      "package": "catfish"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4009,
+    "name": "fdupes",
+    "description": "a program for identifying or deleting duplicate files residing within specified directories",
+    "package_source": {
+      "manager": "pacman",
+      "package": "fdupes"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4010,
+    "name": "Grsync",
+    "description": "GTK GUI for rsync to synchronize folders, files and make backups",
+    "package_source": {
+      "manager": "pacman",
+      "package": "grsync"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4011,
+    "name": "VeraCrypt",
+    "description": "Disk encryption with strong security based on TrueCrypt",
+    "package_source": {
+      "manager": "pacman",
+      "package": "veracrypt"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4012,
+    "name": "restic",
+    "description": "Fast, secure, efficient backup program",
+    "package_source": {
+      "manager": "pacman",
+      "package": "restic"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4013,
+    "name": "BorgBackup",
+    "description": "Deduplicating backup program with compression and authenticated encryption",
+    "package_source": {
+      "manager": "pacman",
+      "package": "borg"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4014,
+    "name": "btop",
+    "description": "A monitor of system resources, bpytop ported to C++",
+    "package_source": {
+      "manager": "pacman",
+      "package": "btop"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4015,
+    "name": "Glances",
+    "description": "CLI curses-based monitoring tool",
+    "package_source": {
+      "manager": "pacman",
+      "package": "glances"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4016,
+    "name": "GSmartControl",
+    "description": "A graphical user interface for the smartctl hard disk drive health inspection tool.",
+    "package_source": {
+      "manager": "pacman",
+      "package": "gsmartcontrol"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4017,
+    "name": "s-tui",
+    "description": "Terminal UI stress test and monitoring tool",
+    "package_source": {
+      "manager": "pacman",
+      "package": "s-tui"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4018,
+    "name": "amdgpu_top",
+    "description": "Tool that shows AMD GPU utilization",
+    "package_source": {
+      "manager": "pacman",
+      "package": "amdgpu_top"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4019,
+    "name": "CoreCtrl",
+    "description": "Core control application",
+    "package_source": {
+      "manager": "pacman",
+      "package": "corectrl"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4020,
+    "name": "Hardinfo2",
+    "description": "System Information and Benchmark for Linux Systems.",
+    "package_source": {
+      "manager": "pacman",
+      "package": "hardinfo2"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4021,
+    "name": "MangoHud",
+    "description": "A Vulkan overlay layer for monitoring FPS, temperatures, CPU/GPU load and more.",
+    "package_source": {
+      "manager": "pacman",
+      "package": "mangohud"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4022,
+    "name": "Wine Staging",
+    "description": "A compatibility layer for running Windows programs - Staging branch",
+    "package_source": {
+      "manager": "pacman",
+      "package": "wine-staging"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4023,
+    "name": "HandBrake CLI",
+    "description": "Multithreaded video transcoder (CLI)",
+    "package_source": {
+      "manager": "pacman",
+      "package": "handbrake-cli"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4024,
+    "name": "MKVToolNix CLI",
+    "description": "Set of tools to create, edit and inspect Matroska files",
+    "package_source": {
+      "manager": "pacman",
+      "package": "mkvtoolnix-cli"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4025,
+    "name": "ExifTool",
+    "description": "Read and write EXIF information",
+    "package_source": {
+      "manager": "pacman",
+      "package": "perl-image-exiftool"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4026,
+    "name": "Tesseract OCR",
+    "description": "An OCR program",
+    "package_source": {
+      "manager": "pacman",
+      "package": "tesseract"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4027,
+    "name": "img2pdf",
+    "description": "Losslessly convert raster images to PDF",
+    "package_source": {
+      "manager": "pacman",
+      "package": "img2pdf"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4028,
+    "name": "Satty",
+    "description": "Modern screenshot annotation tool, inspired by Swappy and Flameshot",
+    "package_source": {
+      "manager": "pacman",
+      "package": "satty"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4029,
+    "name": "imv",
+    "description": "Image viewer for Wayland and X11",
+    "package_source": {
+      "manager": "pacman",
+      "package": "imv"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4030,
+    "name": "wf-recorder",
+    "description": "Screen recorder for wlroots-based compositors such as sway",
+    "package_source": {
+      "manager": "pacman",
+      "package": "wf-recorder"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4031,
+    "name": "Streamlink",
+    "description": "CLI program that launches streams from various streaming services in a custom video player (livestreamer fork)",
+    "package_source": {
+      "manager": "pacman",
+      "package": "streamlink"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4032,
+    "name": "Font Manager",
+    "description": "A simple font management application for GTK+ Desktop Environments",
+    "package_source": {
+      "manager": "pacman",
+      "package": "font-manager"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4033,
+    "name": "Zsh",
+    "description": "A very advanced and programmable command interpreter (shell) for UNIX",
+    "package_source": {
+      "manager": "pacman",
+      "package": "zsh"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4034,
+    "name": "Zellij",
+    "description": "A terminal multiplexer",
+    "package_source": {
+      "manager": "pacman",
+      "package": "zellij"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4035,
+    "name": "Nushell",
+    "description": "A new type of shell",
+    "package_source": {
+      "manager": "pacman",
+      "package": "nushell"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4036,
+    "name": "Atuin",
+    "description": "Magical shell history",
+    "package_source": {
+      "manager": "pacman",
+      "package": "atuin"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4037,
+    "name": "chezmoi",
+    "description": "Manage your dotfiles across multiple machines",
+    "package_source": {
+      "manager": "pacman",
+      "package": "chezmoi"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4038,
+    "name": "GNU Stow",
+    "description": "Manage installation of multiple softwares in the same directory tree",
+    "package_source": {
+      "manager": "pacman",
+      "package": "stow"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4039,
+    "name": "lsd",
+    "description": "Modern ls with a lot of pretty colors and awesome icons",
+    "package_source": {
+      "manager": "pacman",
+      "package": "lsd"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4040,
+    "name": "broot",
+    "description": "Fuzzy Search + tree + cd",
+    "package_source": {
+      "manager": "pacman",
+      "package": "broot"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4041,
+    "name": "dua",
+    "description": "A tool to conveniently learn about the disk usage of directories, fast!",
+    "package_source": {
+      "manager": "pacman",
+      "package": "dua-cli"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4042,
+    "name": "duf",
+    "description": "Disk Usage/Free Utility",
+    "package_source": {
+      "manager": "pacman",
+      "package": "duf"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4043,
+    "name": "pv",
+    "description": "A terminal-based tool for monitoring the progress of data through a pipeline",
+    "package_source": {
+      "manager": "pacman",
+      "package": "pv"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4044,
+    "name": "GNU Parallel",
+    "description": "A shell tool for executing jobs in parallel",
+    "package_source": {
+      "manager": "pacman",
+      "package": "parallel"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4045,
+    "name": "yq",
+    "description": "Command-line YAML, XML, TOML processor - jq wrapper for YAML/XML/TOML documents",
+    "package_source": {
+      "manager": "pacman",
+      "package": "yq"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4046,
+    "name": "age",
+    "description": "A simple, modern and secure file encryption tool",
+    "package_source": {
+      "manager": "pacman",
+      "package": "age"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4047,
+    "name": "asciinema",
+    "description": "Record and share terminal sessions",
+    "package_source": {
+      "manager": "pacman",
+      "package": "asciinema"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4048,
+    "name": "pdfgrep",
+    "description": "A tool to search text in PDF files",
+    "package_source": {
+      "manager": "pacman",
+      "package": "pdfgrep"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4049,
+    "name": "wavemon",
+    "description": "Ncurses-based monitoring application for wireless network devices",
+    "package_source": {
+      "manager": "pacman",
+      "package": "wavemon"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4050,
+    "name": "bandwhich",
+    "description": "Terminal bandwidth utilization tool",
+    "package_source": {
+      "manager": "pacman",
+      "package": "bandwhich"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4051,
+    "name": "vnStat",
+    "description": "A console-based network traffic monitor",
+    "package_source": {
+      "manager": "pacman",
+      "package": "vnstat"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4052,
+    "name": "Transmission CLI",
+    "description": "Fast, easy, and free BitTorrent client (CLI tools, daemon and web client)",
+    "package_source": {
+      "manager": "pacman",
+      "package": "transmission-cli"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4053,
+    "name": "Cloudflare Tunnel",
+    "description": "Command-line client for Cloudflare Tunnel",
+    "package_source": {
+      "manager": "pacman",
+      "package": "cloudflared"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4054,
+    "name": "ZeroTier One",
+    "description": "Creates virtual Ethernet networks of almost unlimited size.",
+    "package_source": {
+      "manager": "pacman",
+      "package": "zerotier-one"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4055,
+    "name": "Gufw",
+    "description": "Uncomplicated way to manage your Linux firewall",
+    "package_source": {
+      "manager": "pacman",
+      "package": "gufw"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4056,
+    "name": "pipx",
+    "description": "Install and Run Python Applications in Isolated Environments",
+    "package_source": {
+      "manager": "pacman",
+      "package": "python-pipx"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4057,
+    "name": "rustup",
+    "description": "The Rust toolchain installer",
+    "package_source": {
+      "manager": "pacman",
+      "package": "rustup"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4058,
+    "name": "nvm",
+    "description": "Node Version Manager - Simple bash script to manage multiple active node.js versions",
+    "package_source": {
+      "manager": "pacman",
+      "package": "nvm"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4059,
+    "name": "pyenv",
+    "description": "Easily switch between multiple versions of Python",
+    "package_source": {
+      "manager": "pacman",
+      "package": "pyenv"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4060,
+    "name": "Poetry",
+    "description": "Python dependency management and packaging made easy",
+    "package_source": {
+      "manager": "pacman",
+      "package": "python-poetry"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4061,
+    "name": "just",
+    "description": "A handy way to save and run project-specific commands",
+    "package_source": {
+      "manager": "pacman",
+      "package": "just"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4062,
+    "name": "Typst",
+    "description": "A markup-based typesetting system for the sciences",
+    "package_source": {
+      "manager": "pacman",
+      "package": "typst"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4063,
+    "name": "hyperfine",
+    "description": "A command-line benchmarking tool",
+    "package_source": {
+      "manager": "pacman",
+      "package": "hyperfine"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4064,
+    "name": "Hugo",
+    "description": "Fast and Flexible Static Site Generator in Go",
+    "package_source": {
+      "manager": "pacman",
+      "package": "hugo"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4065,
+    "name": "git-filter-repo",
+    "description": "Quickly rewrite git repository history (filter-branch replacement)",
+    "package_source": {
+      "manager": "pacman",
+      "package": "git-filter-repo"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4066,
+    "name": "direnv",
+    "description": "A shell extension that manages your environment",
+    "package_source": {
+      "manager": "pacman",
+      "package": "direnv"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4067,
+    "name": "pre-commit",
+    "description": "A framework for managing and maintaining multi-language pre-commit hooks",
+    "package_source": {
+      "manager": "pacman",
+      "package": "pre-commit"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4068,
+    "name": "GitLab CLI",
+    "description": "Cli tool to help work seamlessly with GitLab from the command line",
+    "package_source": {
+      "manager": "pacman",
+      "package": "glab"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4069,
+    "name": "Jujutsu",
+    "description": "Git-compatible VCS that is both simple and powerful",
+    "package_source": {
+      "manager": "pacman",
+      "package": "jujutsu"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4070,
+    "name": "RenderDoc",
+    "description": "OpenGL and Vulkan debugging tool",
+    "package_source": {
+      "manager": "pacman",
+      "package": "renderdoc"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4071,
+    "name": "JupyterLab",
+    "description": "JupyterLab computational environment",
+    "package_source": {
+      "manager": "pacman",
+      "package": "jupyterlab"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4072,
+    "name": "CUDA Toolkit",
+    "description": "NVIDIA's GPU programming toolkit",
+    "package_source": {
+      "manager": "pacman",
+      "package": "cuda"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4073,
+    "name": "ROCm HIP SDK",
+    "description": "Develop applications using HIP and libraries for AMD platforms",
+    "package_source": {
+      "manager": "pacman",
+      "package": "rocm-hip-sdk"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4074,
+    "name": "Podman",
+    "description": "A tool for managing OCI containers and pods.",
+    "package_source": {
+      "manager": "pacman",
+      "package": "podman"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4075,
+    "name": "Distrobox",
+    "description": "Use any linux distribution inside your terminal.",
+    "package_source": {
+      "manager": "pacman",
+      "package": "distrobox"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4076,
+    "name": "lazydocker",
+    "description": "A simple terminal UI for docker and docker-compose, written in Go with the gocui library.",
+    "package_source": {
+      "manager": "pacman",
+      "package": "lazydocker"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4077,
+    "name": "Ansible",
+    "description": "Official assortment of Ansible collections",
+    "package_source": {
+      "manager": "pacman",
+      "package": "ansible"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4078,
+    "name": "kubectl",
+    "description": "A command line tool for communicating with a Kubernetes API server",
+    "package_source": {
+      "manager": "pacman",
+      "package": "kubectl"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4079,
+    "name": "Helm",
+    "description": "The Kubernetes Package Manager",
+    "package_source": {
+      "manager": "pacman",
+      "package": "helm"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4080,
+    "name": "K9s",
+    "description": "TUI for managing Kubernetes clusters and pods",
+    "package_source": {
+      "manager": "pacman",
+      "package": "k9s"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4081,
+    "name": "Terraform",
+    "description": "HashiCorp tool for building and updating infrastructure as code idempotently",
+    "package_source": {
+      "manager": "pacman",
+      "package": "terraform"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4082,
+    "name": "Caddy",
+    "description": "Fast web server with automatic HTTPS",
+    "package_source": {
+      "manager": "pacman",
+      "package": "caddy"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4083,
+    "name": "AWS CLI",
+    "description": "Universal Command Line Interface for Amazon Web Services (version 2)",
+    "package_source": {
+      "manager": "pacman",
+      "package": "aws-cli-v2"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4084,
+    "name": "Arduino CLI",
+    "description": "Arduino command line interface",
+    "package_source": {
+      "manager": "pacman",
+      "package": "arduino-cli"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4085,
+    "name": "esptool",
+    "description": "Espressif SoC serial bootloader utility",
+    "package_source": {
+      "manager": "pacman",
+      "package": "esptool"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4086,
+    "name": "QMK CLI",
+    "description": "CLI tool for customizing supported mechanical keyboards.",
+    "package_source": {
+      "manager": "pacman",
+      "package": "qmk"
+    },
+    "traffic": 0
+  },
+  {
+    "id": 4087,
+    "name": "Wrangler",
+    "description": "The CLI for Cloudflare Workers",
+    "package_source": {
+      "manager": "pacman",
+      "package": "wrangler"
+    },
+    "traffic": 0
   }
 ]

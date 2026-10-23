@@ -1,9 +1,6 @@
 {
   version ? null,
-  sha256 ? null,
 }:
-
-assert (version == null) == (sha256 == null);
 
 let
   nixpkgs = builtins.getFlake "github:NixOS/nixpkgs/nixos-26.05";
@@ -17,13 +14,18 @@ let
   };
   addNvidia = version != null;
   nvidia_x11 =
-    (pkgs.linuxPackages.nvidiaPackages.mkDriver {
-      inherit version;
-      sha256_64bit = sha256;
-      useSettings = false;
-      usePersistenced = false;
-    }).override
-      { libsOnly = true; };
+    (
+      (pkgs.linuxPackages.nvidiaPackages.mkDriver {
+        inherit version;
+        sha256_64bit = null;
+        useSettings = false;
+        usePersistenced = false;
+      }).override
+      { libsOnly = true; }
+    ).overrideAttrs
+      {
+        src = builtins.fetchurl "https://us.download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}.run";
+      };
 in
 pkgs.buildEnv {
   name = "pond-nix-gpu";
